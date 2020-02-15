@@ -1,16 +1,12 @@
 import sys
-import bookkeeping
+from bookkeeping import Book
 from nltk.stem import WordNetLemmatizer
-import nltk
 
 
 def main():
-    # nltk.download('wordnet')
-
-    lemmatizer = WordNetLemmatizer()
-
-    print(lemmatizer.lemmatize(""))
-
+    book = Book("WEBPAGES_CLEAN")
+    document = book.retrieve_document("www.ics.uci.edu/~pattis/common/handouts/macpythoneclipsejava/images/java?C=D;O=A")
+    print(document)
     # print(lemmatization("caresses"))
 
 
