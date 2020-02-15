@@ -1,14 +1,17 @@
 import sys
 import bookkeeping
-
+from nltk.stem import WordNetLemmatizer
+import nltk
 
 
 def main():
-    book = bookkeeping.load_bookkeeping_file(sys.argv[1] + "/bookkeeping.json")
-    print(type(book))
-    # print(book)
+    # nltk.download('wordnet')
 
+    lemmatizer = WordNetLemmatizer()
 
+    print(lemmatizer.lemmatize(""))
+
+    # print(lemmatization("caresses"))
 
 
 if __name__ == "__main__":
