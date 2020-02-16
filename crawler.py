@@ -6,7 +6,7 @@ class Crawler:
         self.explored = set()
 
     def start_crawling(self):
-        pass
+        start = "www.ics.uci.edu"
 
 
     def extract_next_links(self, document_content) -> list:
