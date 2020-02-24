@@ -3,11 +3,12 @@ from collections import defaultdict
 from collections import deque
 from bs4 import BeautifulSoup
 from nltk.stem import WordNetLemmatizer
+from docinfo import DocInfo
 
 
 class Index:
     def __init__(self):
-        self.inverted_index = defaultdict(deque)
+        self.inverted_index = defaultdict(deque)  # defaultdict< str, deque<DocInfo> >
         self.lemmatizer = WordNetLemmatizer()
         self.num_documents = 0
 
@@ -24,6 +25,7 @@ class Index:
     # given a document, add it to appropriate places in the index
     def add_document(self, docid, content):
         word_priorities = dict()  # dict<str, int>
+        term_frequencies = defaultdict(int)
         doc = BeautifulSoup(content, parser='lxml')
 
         def tag_parse(tag_type: str, importance: int) -> None:
@@ -42,6 +44,7 @@ class Index:
         for word in tokenize(doc_text):
             lemmatized_word = self.lemmatizer.lemmatize(word)
             word_priorities[lemmatized_word] = 1
+            term_frequencies[lemmatized_word] += 1
 
         tag_parse('b', 2)
         tag_parse('strong', 2)
@@ -54,14 +57,19 @@ class Index:
         tag_parse('title', 9)
 
 
-
-
-
+        for word, importance in word_priorities.items():
+            info = DocInfo(docid, term_frequencies[word], importance)
+            self.inverted_index[word].append(info)
 
 
 
         self.num_documents += 1
 
+
+    def update_document_frequencies(self):
+        for word, postings_list in self.inverted_index:
+            for doc_info in postings_list:
+                doc_info.document_frequency = len(postings_list)
 
 
 
