@@ -23,7 +23,39 @@ class Index:
 
     # given a document, add it to appropriate places in the index
     def add_document(self, docid, content):
+        def header_parse(header_type: str) -> None:
+            try:
+                headers = doc.find_all(header_type)
+                for header in headers:
+                    print(header.get_text())
+            except AttributeError as e:
+                pass
+
         doc = BeautifulSoup(content, features='lxml')
+        try:
+            title = doc.find('title')
+        except AttributeError as e:
+            pass
+
+        header_parse('h1')
+        header_parse('h2')
+        header_parse('h3')
+        header_parse('h4')
+        header_parse('h5')
+        header_parse('h6')
+
+        try:
+            b = doc.find_all('b')
+        except AttributeError as e:
+            pass
+
+        try:
+            strong = doc.find_all('strong')
+        except AttributeError as e:
+            pass
+
+
+
         doc_text = doc.get_text()
 
         for word in set(tokenize(doc_text)):

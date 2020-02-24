@@ -13,6 +13,7 @@ class DocInfo:
         self._document_frequency = 0
 
         self._inverse_document_frequency = 0.0
+        self._priority = 0
 
 
     def _calculate_normalized_term_frequency(self, tf) -> float:
