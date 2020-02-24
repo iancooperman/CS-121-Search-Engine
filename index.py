@@ -9,6 +9,7 @@ class Index:
     def __init__(self):
         self.inverted_index = defaultdict(deque)
         self.lemmatizer = WordNetLemmatizer()
+        self.num_documents = 0
 
     # save the index to a file
     def save_to_file(self):
@@ -28,6 +29,7 @@ class Index:
         for word in set(tokenize(doc_text)):
             lemmatized = self.lemmatizer.lemmatize(word)
             self.inverted_index[lemmatized].append(docid)
+        self.num_documents += 1
 
     # given a query, return a list of relevant documents
     def query(self, q: str) -> list:
