@@ -23,45 +23,48 @@ class Index:
 
     # given a document, add it to appropriate places in the index
     def add_document(self, docid, content):
-        def header_parse(header_type: str) -> None:
+        word_priorities = dict()  # dict<str, int>
+        doc = BeautifulSoup(content, parser='lxml')
+
+        def tag_parse(tag_type: str, importance: int) -> None:
             try:
-                headers = doc.find_all(header_type)
-                for header in headers:
-                    print(header.get_text())
+                tags = doc.find_all(tag_type)
+                for tag in tags:
+                    tag_text = tag.get_text()
+                    for term in tokenize(tag_text):
+                        lemmatized_term = self.lemmatizer.lemmatize(term)
+                        word_priorities[lemmatized_term] = importance
             except AttributeError as e:
                 pass
 
-        doc = BeautifulSoup(content, features='lxml')
-        try:
-            title = doc.find('title')
-        except AttributeError as e:
-            pass
-
-        header_parse('h1')
-        header_parse('h2')
-        header_parse('h3')
-        header_parse('h4')
-        header_parse('h5')
-        header_parse('h6')
-
-        try:
-            b = doc.find_all('b')
-        except AttributeError as e:
-            pass
-
-        try:
-            strong = doc.find_all('strong')
-        except AttributeError as e:
-            pass
-
-
-
+        # set all words to importance 1
         doc_text = doc.get_text()
+        for word in tokenize(doc_text):
+            lemmatized_word = self.lemmatizer.lemmatize(word)
+            word_priorities[lemmatized_word] = 1
 
-        for word in set(tokenize(doc_text)):
-            lemmatized = self.lemmatizer.lemmatize(word)
-            self.inverted_index[lemmatized].append(docid)
+        tag_parse('b', 2)
+        tag_parse('strong', 2)
+        tag_parse('h6', 3)
+        tag_parse('h5', 4)
+        tag_parse('h4', 5)
+        tag_parse('h3', 6)
+        tag_parse('h2', 7)
+        tag_parse('h1', 8)
+        tag_parse('title', 9)
+
+
+
+
+
+
+
+
         self.num_documents += 1
+
+
+
+
 
     # given a query, return a list of relevant documents
     def query(self, q: str) -> list:
