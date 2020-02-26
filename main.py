@@ -95,7 +95,7 @@ def main():
                     index.add_document(docid, content)
                     count += 1
 
-    print(count)
+    index.update_document_frequencies()
 
     index.save_to_file()
 

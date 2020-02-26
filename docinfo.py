@@ -20,8 +20,8 @@ class DocInfo:
             return 1 + math.log(tf, 10)
         return 0.0
 
-    def _calculate_inverse_document_frequency(self, N, df) -> float:
-        self._inverse_document_frequency =  math.log((N/df), 10)
+    def calculate_inverse_document_frequency(self, N, df) -> None:
+        self._inverse_document_frequency = math.log((N/df), 10)
 
     def tfidf(self) -> float:
         return self._normalized_term_frequency * self._inverse_document_frequency

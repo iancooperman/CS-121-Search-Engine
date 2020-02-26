@@ -24,11 +24,11 @@ class Index:
 
     # given a document, add it to appropriate places in the index
     def add_document(self, docid, content):
-        word_priorities = dict()  # dict<str, int>
+        word_priorities = dict()  # dict<str, float>
         term_frequencies = defaultdict(int)
-        doc = BeautifulSoup(content, parser='lxml')
+        doc = BeautifulSoup(content, features='lxml')
 
-        def tag_parse(tag_type: str, importance: int) -> None:
+        def tag_parse(tag_type: str, importance: float) -> None:
             try:
                 tags = doc.find_all(tag_type)
                 for tag in tags:
@@ -43,47 +43,47 @@ class Index:
         doc_text = doc.get_text()
         for word in tokenize(doc_text):
             lemmatized_word = self.lemmatizer.lemmatize(word)
-            word_priorities[lemmatized_word] = 1
+            word_priorities[lemmatized_word] = 0/8
             term_frequencies[lemmatized_word] += 1
 
-        tag_parse('b', 2)
-        tag_parse('strong', 2)
-        tag_parse('h6', 3)
-        tag_parse('h5', 4)
-        tag_parse('h4', 5)
-        tag_parse('h3', 6)
-        tag_parse('h2', 7)
-        tag_parse('h1', 8)
-        tag_parse('title', 9)
+        tag_parse('b', 1/8)
+        tag_parse('strong', 1/8)
+        tag_parse('h6', 2/8)
+        tag_parse('h5', 3/8)
+        tag_parse('h4', 4/8)
+        tag_parse('h3', 5/8)
+        tag_parse('h2', 6/8)
+        tag_parse('h1', 7/8)
+        tag_parse('title', 8/8)
 
-
-        for word, importance in word_priorities.items():
-            info = DocInfo(docid, term_frequencies[word], importance)
+        for word, word_importance in word_priorities.items():
+            info = DocInfo(docid, term_frequencies[word], word_importance)
             self.inverted_index[word].append(info)
-
-
 
         self.num_documents += 1
 
-
     def update_document_frequencies(self):
-        for word, postings_list in self.inverted_index:
+        for word, postings_list in self.inverted_index.items():
             for doc_info in postings_list:
-                doc_info.document_frequency = len(postings_list)
-
-
-
+                doc_info.calculate_inverse_document_frequency(self.num_documents, len(postings_list))
 
     # given a query, return a list of relevant documents
     def query(self, q: str) -> list:
-        result = []
-        tokenized_query = tokenize(q)
-        for word in tokenized_query:
-            root_word = self.lemmatizer.lemmatize(word)
-            for url in self.inverted_index[root_word]:
-                result.append(url)
+        lemmatized_query = [self.lemmatizer.lemmatize(word) for word in tokenize(q)]
 
-        return result
+        if len(lemmatized_query) > 1:
+            # do the cosine similarity
+            pass
+        else:
+            # rank by tf-idf
+            query_word = lemmatized_query[0]
+            search_results = []
+            for DI in self.inverted_index[query_word]:
+                search_results.append(DI)
+            # Sort list of query results by tfidf value
+            search_results.sort(key=lambda x: x.tfidf())
+
+            return search_results
 
 
 def tokenize(text: str) -> list:

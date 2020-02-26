@@ -7,16 +7,15 @@ def main():
     index = Index()
     index.load_from_file()
 
-    book = Book("WEBPAGES_CLEAN")
+    book = Book("WEBPAGES_RAW")
 
-    print("Unique Words: " + str(len(index.inverted_index)))
     query_result = index.query("Irvine")
     num_results = len(query_result)
 
     print(f"{num_results} results:")
 
-    for docid in query_result[0:20]:
-        print(book.retrieve_url(docid))
+    for docinfo in query_result[0:20]:
+        print(book.retrieve_url(docinfo._docid), docinfo.tfidf())
 
 
 
