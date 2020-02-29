@@ -73,7 +73,7 @@ class Index:
 
         if len(lemmatized_query) > 1:
             # do the cosine similarity
-            pass
+            return []
         else:
             # rank by tf-idf
             query_word = lemmatized_query[0]
@@ -81,7 +81,7 @@ class Index:
             for DI in self.inverted_index[query_word]:
                 search_results.append(DI)
             # Sort list of query results by tfidf value
-            search_results.sort(key=lambda x: x.tfidf())
+            search_results.sort(key=lambda x: x.tfidf() + x._relative_importance, reverse=True)
 
             return search_results
 

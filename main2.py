@@ -9,7 +9,8 @@ def main():
 
     book = Book("WEBPAGES_RAW")
 
-    query_result = index.query("Irvine")
+    print("Searching...")
+    query_result = index.query("Informatics")
     num_results = len(query_result)
 
     print(f"{num_results} results:")
