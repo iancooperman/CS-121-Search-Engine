@@ -6,17 +6,22 @@ from bookkeeping import Book
 def main():
     index = Index()
     index.load_from_file()
+    print("Loading index...")
 
     book = Book("WEBPAGES_RAW")
 
-    print("Searching...")
-    query_result = index.query("Informatics")
-    num_results = len(query_result)
+    while True:
+        query = input("Enter a query: ")
 
-    print(f"{num_results} results:")
+        print("Searching...")
+        query_result = index.query(query)
+        num_results = len(query_result)
 
-    for docinfo in query_result[0:20]:
-        print(book.retrieve_url(docinfo._docid), docinfo.tfidf())
+        print(f"{num_results} results:")
+
+        for docid_score_pair in query_result[0:20]:
+            print(book.retrieve_url(docid_score_pair[0]), docid_score_pair[1])
+        print()
 
 
 
