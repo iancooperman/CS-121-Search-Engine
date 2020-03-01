@@ -4,6 +4,7 @@ from collections import deque
 from bs4 import BeautifulSoup
 from nltk.stem import WordNetLemmatizer
 from docinfo import DocInfo
+import math
 
 
 class Index:
@@ -69,17 +70,41 @@ class Index:
 
     # given a query, return a list of relevant documents
     def query(self, q: str) -> list:
-        lemmatized_query = [self.lemmatizer.lemmatize(word) for word in tokenize(q)]
+        query_term_frequency = defaultdict(int)
+        lemmatized_query = []
+        for word in tokenize(q):
+            self.lemmatizer.lemmatize(word)
+            lemmatized_query.append(word)
+            query_term_frequency[word] += 1
 
         if len(lemmatized_query) > 1:
-            # do the cosine similarity
-            return []
+            # Cosine Similarity
+            doc_scores = defaultdict(float)
+            doc_lengths = defaultdict(float)
+            query_length = 0.0 # sqrt(x1 ** 2 + x2 ** 2 + ... + xN ** 2)
+            for term in lemmatized_query:
+                # calculate tfidf for query
+                tf = 1 + math.log(query_term_frequency[word], 10)
+                idf = math.log((self.num_documents/len(self.inverted_index[term])), 10)
+                query_weight = tf * idf
+                query_length += tf ** 2
+                for doc in self.inverted_index[term]:
+                    doc_scores[doc] += query_weight * doc.tfidf()
+                    # doc_lengths[doc] ? in add_document maybe?
+            search_results = []
+            query_length = math.sqrt(query_length)
+            for term in lemmatized_query:
+                for docInfo in self.inverted_index[term]:
+                    doc_scores[docInfo] = doc_scores[docInfo]/(doc_lengths[docInfo] * query_length) # doc_lengths not done yet
+                    search_results.append(docInfo)
+            # Sort list of query results by Cosine Similarity value
+            search_results.sort(key=lambda x: doc_scores[docInfo] + x._relative_importance, reverse=True)
         else:
             # rank by tf-idf
             query_word = lemmatized_query[0]
             search_results = []
-            for DI in self.inverted_index[query_word]:
-                search_results.append(DI)
+            for docInfo in self.inverted_index[query_word]:
+                search_results.append(docInfo)
             # Sort list of query results by tfidf value
             search_results.sort(key=lambda x: x.tfidf() + x._relative_importance, reverse=True)
 
