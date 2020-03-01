@@ -5,8 +5,8 @@ from bookkeeping import Book
 
 def main():
     index = Index()
-    index.load_from_file()
     print("Loading index...")
+    index.load_from_file()
 
     book = Book("WEBPAGES_RAW")
 
@@ -17,10 +17,11 @@ def main():
         query_result = index.query(query)
         num_results = len(query_result)
 
-        print(f"{num_results} results:")
+        print(f"{num_results} results")
+        print("Showing first twenty:")
 
         for docid_score_pair in query_result[0:20]:
-            print(book.retrieve_url(docid_score_pair[0]), docid_score_pair[1])
+            print(book.retrieve_url(docid_score_pair[0]))
         print()
 
 
